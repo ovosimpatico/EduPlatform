@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import { Button } from '@/components/ui/button';
@@ -8,12 +8,13 @@ import { Badge } from '@/components/ui/badge';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { GraduationCap, TrendingUp } from 'lucide-react';
+import { GraduationCap, TrendingUp, User } from 'lucide-react';
 import { ModeToggle } from '@/components/mode-toggle';
 import { EmptyState } from '@/components/empty-state';
 import { PiExam } from 'react-icons/pi';
 
 const DiagnosticQuiz: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
   const [quiz, setQuiz] = useState<any>(null);
   const [answers, setAnswers] = useState<number[]>([]);
   const [result, setResult] = useState<any>(null);
@@ -22,17 +23,18 @@ const DiagnosticQuiz: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    loadQuiz();
-  }, []);
+    if (id) {
+      loadQuiz();
+    }
+  }, [id]);
 
   const loadQuiz = async () => {
     try {
-      const response = await api.get('/diagnostic/English');
+      const response = await api.get(`/diagnostic/quiz/${id}`);
       setQuiz(response.data);
       setAnswers(new Array(response.data.questions.length).fill(-1));
     } catch (error) {
       console.error('Failed to load quiz', error);
-      alert('Diagnostic quiz not available yet.');
     } finally {
       setLoading(false);
     }
@@ -40,7 +42,7 @@ const DiagnosticQuiz: React.FC = () => {
 
   const handleSubmit = async () => {
     try {
-      const response = await api.post('/diagnostic/English/submit', { answers });
+      const response = await api.post(`/diagnostic/quiz/${id}/submit`, { answers });
       setResult(response.data);
       await refreshUser();
     } catch (error) {
@@ -90,13 +92,20 @@ const DiagnosticQuiz: React.FC = () => {
             </div>
             <div className="flex items-center justify-center gap-2 mb-2">
               <TrendingUp className="h-6 w-6 text-primary" />
-              <CardTitle className="text-3xl">Your Level: {result.level}</CardTitle>
+              <CardTitle className="text-3xl capitalize">Your Level: {result.level}</CardTitle>
             </div>
             <CardDescription>
               Based on your performance, we recommend starting with {result.level} level courses.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
+            <div className="text-center p-4 bg-muted rounded-lg">
+              <div className="text-sm text-muted-foreground mb-1">Overall Score</div>
+              <div className="text-4xl font-bold text-primary">{result.overallPercentage}%</div>
+            </div>
+
+            <Separator />
+
             <div className="grid grid-cols-3 gap-4">
               <div className="text-center space-y-2">
                 <Badge variant="outline" className="w-full justify-center py-2">
@@ -120,9 +129,14 @@ const DiagnosticQuiz: React.FC = () => {
 
             <Separator />
 
-            <Button onClick={() => navigate('/courses')} className="w-full">
-              Browse Courses
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => navigate('/diagnostic-selection')} className="flex-1">
+                Take Another Quiz
+              </Button>
+              <Button onClick={() => navigate('/courses')} className="flex-1">
+                Browse Courses
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -142,10 +156,17 @@ const DiagnosticQuiz: React.FC = () => {
             </div>
             <div className="flex items-center justify-center gap-2 mb-2">
               <GraduationCap className="h-6 w-6 text-primary" />
-              <CardTitle className="text-2xl">Diagnostic Quiz - English</CardTitle>
+              <CardTitle className="text-2xl">{quiz.title}</CardTitle>
             </div>
-            <CardDescription>
-              This quiz will help determine your current level and recommend appropriate courses.
+            <CardDescription className="space-y-2">
+              {quiz.description && <div>{quiz.description}</div>}
+              <div className="flex items-center justify-center gap-1 text-sm">
+                <User className="h-3 w-3" />
+                <span>By {quiz.teacher?.name || 'Unknown'}</span>
+              </div>
+              <div className="text-sm">
+                This quiz will help determine your current level and recommend appropriate courses.
+              </div>
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -178,7 +199,7 @@ const DiagnosticQuiz: React.FC = () => {
             ))}
 
             <div className="flex gap-4 pt-4">
-              <Button variant="outline" onClick={() => navigate('/dashboard')} className="flex-1">
+              <Button variant="outline" onClick={() => navigate('/diagnostic-selection')} className="flex-1">
                 Cancel
               </Button>
               <Button

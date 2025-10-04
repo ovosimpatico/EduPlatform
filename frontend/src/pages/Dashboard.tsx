@@ -68,17 +68,23 @@ const Dashboard: React.FC = () => {
                 <BookOpen className="mr-2 h-4 w-4" />
                 Browse Courses
               </Button>
-              {user?.role === 'student' && !user?.level && (
-                <Button variant="default" onClick={() => navigate('/diagnostic')}>
+              {user?.role === 'student' && (
+                <Button variant="default" onClick={() => navigate('/diagnostic-selection')}>
                   <GraduationCap className="mr-2 h-4 w-4" />
-                  Take Diagnostic Quiz
+                  {!user?.level ? 'Take Diagnostic Quiz' : 'Retake Diagnostic'}
                 </Button>
               )}
               {user?.role === 'teacher' && (
-                <Button variant="default" onClick={() => navigate('/create-course')}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Create Course
-                </Button>
+                <>
+                  <Button variant="default" onClick={() => navigate('/create-course')}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Create Course
+                  </Button>
+                  <Button variant="outline" onClick={() => navigate('/create-diagnostic-quiz')}>
+                    <GraduationCap className="mr-2 h-4 w-4" />
+                    Create Diagnostic Quiz
+                  </Button>
+                </>
               )}
               <ModeToggle />
               <Button variant="outline" onClick={handleLogout}>

@@ -6,7 +6,9 @@ import Dashboard from './pages/Dashboard';
 import Courses from './pages/Courses';
 import CourseDetail from './pages/CourseDetail';
 import DiagnosticQuiz from './pages/DiagnosticQuiz';
+import DiagnosticQuizSelection from './pages/DiagnosticQuizSelection';
 import CreateCourse from './pages/CreateCourse';
+import CreateDiagnosticQuiz from './pages/CreateDiagnosticQuiz';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -83,7 +85,15 @@ function App() {
             }
           />
           <Route
-            path="/diagnostic"
+            path="/diagnostic-selection"
+            element={
+              <PrivateRoute>
+                <DiagnosticQuizSelection />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/diagnostic/:id"
             element={
               <PrivateRoute>
                 <DiagnosticQuiz />
@@ -95,6 +105,14 @@ function App() {
             element={
               <PrivateRoute>
                 <CreateCourse />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/create-diagnostic-quiz"
+            element={
+              <PrivateRoute>
+                <CreateDiagnosticQuiz />
               </PrivateRoute>
             }
           />
