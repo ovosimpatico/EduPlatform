@@ -7,13 +7,16 @@ import Courses from './pages/Courses';
 import CourseDetail from './pages/CourseDetail';
 import DiagnosticQuiz from './pages/DiagnosticQuiz';
 import CreateCourse from './pages/CreateCourse';
-import './App.scss';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <div className="loading">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
   }
 
   return user ? <>{children}</> : <Navigate to="/login" />;
@@ -23,7 +26,11 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <div className="loading">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
   }
 
   return !user ? <>{children}</> : <Navigate to="/dashboard" />;

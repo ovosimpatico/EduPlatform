@@ -2,7 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
-import './DiagnosticQuiz.scss';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import { GraduationCap, TrendingUp } from 'lucide-react';
+import { ModeToggle } from '@/components/mode-toggle';
+import { EmptyState } from '@/components/empty-state';
+import { PiExam } from 'react-icons/pi';
 
 const DiagnosticQuiz: React.FC = () => {
   const [quiz, setQuiz] = useState<any>(null);
@@ -40,19 +49,29 @@ const DiagnosticQuiz: React.FC = () => {
   };
 
   if (loading) {
-    return <div className="loading">Loading quiz...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg">Loading quiz...</div>
+      </div>
+    );
   }
 
   if (!quiz) {
     return (
-      <div className="quiz-container">
-        <div className="quiz-card">
-          <img src="/logo-notext.png" alt="EduPlatform" className="quiz-logo" />
-          <h1>Diagnostic Quiz Not Available</h1>
-          <p>Please contact an administrator to set up the diagnostic quiz.</p>
-          <button onClick={() => navigate('/dashboard')} className="btn-primary">
-            Back to Dashboard
-          </button>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-4">
+        <div className="absolute top-4 right-4">
+          <ModeToggle />
+        </div>
+        <div className="w-full max-w-md">
+          <EmptyState
+            icon={<PiExam />}
+            title="Diagnostic Quiz Not Available"
+            description="The diagnostic quiz hasn't been set up yet. Please contact an administrator or check back later."
+            action={{
+              label: 'Back to Dashboard',
+              onClick: () => navigate('/dashboard'),
+            }}
+          />
         </div>
       </div>
     );
@@ -60,84 +79,118 @@ const DiagnosticQuiz: React.FC = () => {
 
   if (result) {
     return (
-      <div className="quiz-container">
-        <div className="quiz-card result-card">
-          <img src="/logo-notext.png" alt="EduPlatform" className="quiz-logo" />
-          <h1>Your Level: {result.level}</h1>
-          <p className="result-message">
-            Based on your performance, we recommend starting with {result.level} level courses.
-          </p>
-
-          <div className="scores">
-            <div className="score-item">
-              <span className="score-label">Beginner:</span>
-              <span className="score-value">{result.scores.beginner}</span>
-            </div>
-            <div className="score-item">
-              <span className="score-label">Intermediate:</span>
-              <span className="score-value">{result.scores.intermediate}</span>
-            </div>
-            <div className="score-item">
-              <span className="score-label">Advanced:</span>
-              <span className="score-value">{result.scores.advanced}</span>
-            </div>
-          </div>
-
-          <button onClick={() => navigate('/courses')} className="btn-primary">
-            Browse Courses
-          </button>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-4">
+        <div className="absolute top-4 right-4">
+          <ModeToggle />
         </div>
+        <Card className="w-full max-w-2xl">
+          <CardHeader className="text-center">
+            <div className="flex justify-center mb-4">
+              <img src="/logo-notext.png" alt="EduPlatform" className="h-16" />
+            </div>
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <TrendingUp className="h-6 w-6 text-primary" />
+              <CardTitle className="text-3xl">Your Level: {result.level}</CardTitle>
+            </div>
+            <CardDescription>
+              Based on your performance, we recommend starting with {result.level} level courses.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-3 gap-4">
+              <div className="text-center space-y-2">
+                <Badge variant="outline" className="w-full justify-center py-2">
+                  Beginner
+                </Badge>
+                <div className="text-2xl font-bold">{result.scores.beginner}</div>
+              </div>
+              <div className="text-center space-y-2">
+                <Badge variant="outline" className="w-full justify-center py-2">
+                  Intermediate
+                </Badge>
+                <div className="text-2xl font-bold">{result.scores.intermediate}</div>
+              </div>
+              <div className="text-center space-y-2">
+                <Badge variant="outline" className="w-full justify-center py-2">
+                  Advanced
+                </Badge>
+                <div className="text-2xl font-bold">{result.scores.advanced}</div>
+              </div>
+            </div>
+
+            <Separator />
+
+            <Button onClick={() => navigate('/courses')} className="w-full">
+              Browse Courses
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   return (
-    <div className="quiz-container">
-      <div className="quiz-card">
-        <img src="/logo-notext.png" alt="EduPlatform" className="quiz-logo" />
-        <h1>Diagnostic Quiz - English</h1>
-        <p className="quiz-description">
-          This quiz will help determine your current level and recommend appropriate courses.
-        </p>
-
-        <div className="questions">
-          {quiz.questions.map((question: any, index: number) => (
-            <div key={index} className="question">
-              <h3>Question {index + 1}</h3>
-              <p>{question.question}</p>
-              <div className="options">
-                {question.options.map((option: string, optIndex: number) => (
-                  <label key={optIndex} className="option">
-                    <input
-                      type="radio"
-                      name={`question-${index}`}
-                      checked={answers[index] === optIndex}
-                      onChange={() => {
-                        const newAnswers = [...answers];
-                        newAnswers[index] = optIndex;
-                        setAnswers(newAnswers);
-                      }}
-                    />
-                    {option}
-                  </label>
-                ))}
-              </div>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-4">
+      <div className="absolute top-4 right-4">
+        <ModeToggle />
+      </div>
+      <div className="container mx-auto py-8 max-w-3xl">
+        <Card>
+          <CardHeader className="text-center">
+            <div className="flex justify-center mb-4">
+              <img src="/logo-notext.png" alt="EduPlatform" className="h-16" />
             </div>
-          ))}
-        </div>
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <GraduationCap className="h-6 w-6 text-primary" />
+              <CardTitle className="text-2xl">Diagnostic Quiz - English</CardTitle>
+            </div>
+            <CardDescription>
+              This quiz will help determine your current level and recommend appropriate courses.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {quiz.questions.map((question: any, index: number) => (
+              <div key={index} className="space-y-3">
+                <h3 className="font-semibold text-lg">Question {index + 1}</h3>
+                <p className="text-muted-foreground">{question.question}</p>
+                <RadioGroup
+                  value={answers[index]?.toString()}
+                  onValueChange={(value) => {
+                    const newAnswers = [...answers];
+                    newAnswers[index] = parseInt(value);
+                    setAnswers(newAnswers);
+                  }}
+                >
+                  {question.options.map((option: string, optIndex: number) => (
+                    <div key={optIndex} className="flex items-center space-x-2">
+                      <RadioGroupItem
+                        value={optIndex.toString()}
+                        id={`q${index}-opt${optIndex}`}
+                      />
+                      <Label htmlFor={`q${index}-opt${optIndex}`} className="cursor-pointer">
+                        {option}
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+                {index < quiz.questions.length - 1 && <Separator />}
+              </div>
+            ))}
 
-        <div className="quiz-actions">
-          <button onClick={() => navigate('/dashboard')} className="btn-secondary">
-            Cancel
-          </button>
-          <button
-            onClick={handleSubmit}
-            className="btn-primary"
-            disabled={answers.some(a => a === -1)}
-          >
-            Submit Quiz
-          </button>
-        </div>
+            <div className="flex gap-4 pt-4">
+              <Button variant="outline" onClick={() => navigate('/dashboard')} className="flex-1">
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSubmit}
+                disabled={answers.some((a) => a === -1)}
+                className="flex-1"
+              >
+                Submit Quiz
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

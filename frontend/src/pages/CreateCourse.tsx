@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
-import './CreateCourse.scss';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+import { ArrowLeft, Plus, X } from 'lucide-react';
+import { ModeToggle } from '@/components/mode-toggle';
 
 const CreateCourse: React.FC = () => {
   const navigate = useNavigate();
@@ -24,6 +32,15 @@ const CreateCourse: React.FC = () => {
     });
   };
 
+  const removeLesson = (index: number) => {
+    if (course.lessons.length > 1) {
+      setCourse({
+        ...course,
+        lessons: course.lessons.filter((_, i) => i !== index),
+      });
+    }
+  };
+
   const updateLesson = (index: number, field: string, value: string) => {
     const newLessons = [...course.lessons];
     (newLessons[index] as any)[field] = value;
@@ -41,6 +58,18 @@ const CreateCourse: React.FC = () => {
         ],
       },
     });
+  };
+
+  const removeQuestion = (index: number) => {
+    if (course.finalAssessment.questions.length > 1) {
+      setCourse({
+        ...course,
+        finalAssessment: {
+          ...course.finalAssessment,
+          questions: course.finalAssessment.questions.filter((_, i) => i !== index),
+        },
+      });
+    }
   };
 
   const updateQuestion = (index: number, field: string, value: any) => {
@@ -74,166 +103,245 @@ const CreateCourse: React.FC = () => {
   };
 
   return (
-    <div className="create-course">
-      <div className="create-course-container">
-        <div className="create-course-header">
-          <img src="/logo-notext.png" alt="EduPlatform" className="create-logo" />
-          <h1>Create New Course</h1>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div className="border-b bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <img src="/logo-notext.png" alt="EduPlatform" className="h-10" />
+              <h1 className="text-2xl font-bold">Create New Course</h1>
+            </div>
+            <ModeToggle />
+          </div>
         </div>
+      </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="form-section">
-            <h2>Course Information</h2>
-
-            <div className="form-group">
-              <label>Title</label>
-              <input
-                type="text"
-                value={course.title}
-                onChange={(e) => setCourse({ ...course, title: e.target.value })}
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Description</label>
-              <textarea
-                value={course.description}
-                onChange={(e) => setCourse({ ...course, description: e.target.value })}
-                required
-                rows={4}
-              />
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label>Level</label>
-                <select
-                  value={course.level}
-                  onChange={(e) => setCourse({ ...course, level: e.target.value as any })}
-                >
-                  <option value="beginner">Beginner</option>
-                  <option value="intermediate">Intermediate</option>
-                  <option value="advanced">Advanced</option>
-                </select>
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Course Information */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Course Information</CardTitle>
+              <CardDescription>Basic details about your course</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="title">Title</Label>
+                <Input
+                  id="title"
+                  value={course.title}
+                  onChange={(e) => setCourse({ ...course, title: e.target.value })}
+                  required
+                  placeholder="Enter course title"
+                />
               </div>
 
-              <div className="form-group">
-                <label>Category</label>
-                <input
-                  type="text"
-                  value={course.category}
-                  onChange={(e) => setCourse({ ...course, category: e.target.value })}
+              <div className="space-y-2">
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  value={course.description}
+                  onChange={(e) => setCourse({ ...course, description: e.target.value })}
+                  required
+                  rows={4}
+                  placeholder="Describe your course"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="level">Level</Label>
+                  <Select
+                    value={course.level}
+                    onValueChange={(value) => setCourse({ ...course, level: value as any })}
+                  >
+                    <SelectTrigger id="level">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="beginner">Beginner</SelectItem>
+                      <SelectItem value="intermediate">Intermediate</SelectItem>
+                      <SelectItem value="advanced">Advanced</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="category">Category</Label>
+                  <Input
+                    id="category"
+                    value={course.category}
+                    onChange={(e) => setCourse({ ...course, category: e.target.value })}
+                    required
+                    placeholder="e.g., English, Math"
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Lessons */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Lessons</CardTitle>
+              <CardDescription>Add content for each lesson</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {course.lessons.map((lesson, index) => (
+                <div key={index}>
+                  {index > 0 && <Separator className="my-6" />}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-semibold">Lesson {index + 1}</h3>
+                      {course.lessons.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeLesson(index)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor={`lesson-title-${index}`}>Title</Label>
+                      <Input
+                        id={`lesson-title-${index}`}
+                        value={lesson.title}
+                        onChange={(e) => updateLesson(index, 'title', e.target.value)}
+                        required
+                        placeholder="Lesson title"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor={`lesson-content-${index}`}>Content</Label>
+                      <Textarea
+                        id={`lesson-content-${index}`}
+                        value={lesson.content}
+                        onChange={(e) => updateLesson(index, 'content', e.target.value)}
+                        required
+                        rows={6}
+                        placeholder="Lesson content (HTML supported)"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <Button type="button" variant="outline" onClick={addLesson} className="w-full">
+                <Plus className="mr-2 h-4 w-4" />
+                Add Lesson
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Final Assessment */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Final Assessment</CardTitle>
+              <CardDescription>Create questions for the final assessment</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="passingScore">Passing Score (%)</Label>
+                <Input
+                  id="passingScore"
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={course.finalAssessment.passingScore}
+                  onChange={(e) =>
+                    setCourse({
+                      ...course,
+                      finalAssessment: {
+                        ...course.finalAssessment,
+                        passingScore: parseInt(e.target.value),
+                      },
+                    })
+                  }
                   required
                 />
               </div>
-            </div>
-          </div>
 
-          <div className="form-section">
-            <h2>Lessons</h2>
-            {course.lessons.map((lesson, index) => (
-              <div key={index} className="lesson-form">
-                <h3>Lesson {index + 1}</h3>
-                <div className="form-group">
-                  <label>Title</label>
-                  <input
-                    type="text"
-                    value={lesson.title}
-                    onChange={(e) => updateLesson(index, 'title', e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Content</label>
-                  <textarea
-                    value={lesson.content}
-                    onChange={(e) => updateLesson(index, 'content', e.target.value)}
-                    required
-                    rows={6}
-                  />
-                </div>
-              </div>
-            ))}
-            <button type="button" onClick={addLesson} className="btn-add">
-              + Add Lesson
-            </button>
-          </div>
+              <Separator />
 
-          <div className="form-section">
-            <h2>Final Assessment</h2>
-
-            <div className="form-group">
-              <label>Passing Score (%)</label>
-              <input
-                type="number"
-                min="0"
-                max="100"
-                value={course.finalAssessment.passingScore}
-                onChange={(e) =>
-                  setCourse({
-                    ...course,
-                    finalAssessment: {
-                      ...course.finalAssessment,
-                      passingScore: parseInt(e.target.value),
-                    },
-                  })
-                }
-                required
-              />
-            </div>
-
-            {course.finalAssessment.questions.map((question, qIndex) => (
-              <div key={qIndex} className="question-form">
-                <h3>Question {qIndex + 1}</h3>
-                <div className="form-group">
-                  <label>Question</label>
-                  <input
-                    type="text"
-                    value={question.question}
-                    onChange={(e) => updateQuestion(qIndex, 'question', e.target.value)}
-                    required
-                  />
-                </div>
-                {question.options.map((option, oIndex) => (
-                  <div key={oIndex} className="form-group">
-                    <label>Option {oIndex + 1}</label>
-                    <input
-                      type="text"
-                      value={option}
-                      onChange={(e) => updateOption(qIndex, oIndex, e.target.value)}
-                      required
-                    />
+              {course.finalAssessment.questions.map((question, qIndex) => (
+                <div key={qIndex}>
+                  {qIndex > 0 && <Separator className="my-6" />}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-semibold">Question {qIndex + 1}</h3>
+                      {course.finalAssessment.questions.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeQuestion(qIndex)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor={`question-${qIndex}`}>Question</Label>
+                      <Input
+                        id={`question-${qIndex}`}
+                        value={question.question}
+                        onChange={(e) => updateQuestion(qIndex, 'question', e.target.value)}
+                        required
+                        placeholder="Enter question"
+                      />
+                    </div>
+                    <div className="space-y-3">
+                      <Label>Options</Label>
+                      {question.options.map((option, oIndex) => (
+                        <Input
+                          key={oIndex}
+                          value={option}
+                          onChange={(e) => updateOption(qIndex, oIndex, e.target.value)}
+                          required
+                          placeholder={`Option ${oIndex + 1}`}
+                        />
+                      ))}
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor={`correct-${qIndex}`}>Correct Answer</Label>
+                      <Select
+                        value={question.correctAnswer.toString()}
+                        onValueChange={(value) =>
+                          updateQuestion(qIndex, 'correctAnswer', parseInt(value))
+                        }
+                      >
+                        <SelectTrigger id={`correct-${qIndex}`}>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="0">Option 1</SelectItem>
+                          <SelectItem value="1">Option 2</SelectItem>
+                          <SelectItem value="2">Option 3</SelectItem>
+                          <SelectItem value="3">Option 4</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
-                ))}
-                <div className="form-group">
-                  <label>Correct Answer</label>
-                  <select
-                    value={question.correctAnswer}
-                    onChange={(e) =>
-                      updateQuestion(qIndex, 'correctAnswer', parseInt(e.target.value))
-                    }
-                  >
-                    <option value={0}>Option 1</option>
-                    <option value={1}>Option 2</option>
-                    <option value={2}>Option 3</option>
-                    <option value={3}>Option 4</option>
-                  </select>
                 </div>
-              </div>
-            ))}
-            <button type="button" onClick={addQuestion} className="btn-add">
-              + Add Question
-            </button>
-          </div>
+              ))}
+              <Button type="button" variant="outline" onClick={addQuestion} className="w-full">
+                <Plus className="mr-2 h-4 w-4" />
+                Add Question
+              </Button>
+            </CardContent>
+          </Card>
 
-          <div className="form-actions">
-            <button type="button" onClick={() => navigate('/dashboard')} className="btn-cancel">
+          {/* Actions */}
+          <div className="flex gap-4">
+            <Button type="button" variant="outline" onClick={() => navigate('/dashboard')} className="flex-1">
+              <ArrowLeft className="mr-2 h-4 w-4" />
               Cancel
-            </button>
-            <button type="submit" className="btn-submit">
+            </Button>
+            <Button type="submit" className="flex-1">
               Create Course
-            </button>
+            </Button>
           </div>
         </form>
       </div>

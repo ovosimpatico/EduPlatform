@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import './Login.scss';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
+import { ModeToggle } from '@/components/mode-toggle';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -27,48 +33,66 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="login-container">
-      <div className="login-card">
-        <img src="/logo-text.png" alt="EduPlatform" className="logo" />
-        <h1>Welcome Back!</h1>
-        <p className="subtitle">Sign in to continue your learning journey</p>
-
-        <form onSubmit={handleSubmit} className="login-form">
-          {error && <div className="error-message">{error}</div>}
-
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              placeholder="Enter your email"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              placeholder="Enter your password"
-            />
-          </div>
-
-          <button type="submit" className="btn-primary" disabled={loading}>
-            {loading ? 'Signing in...' : 'Sign In'}
-          </button>
-        </form>
-
-        <p className="register-link">
-          Don't have an account? <Link to="/register">Register here</Link>
-        </p>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-4">
+      <div className="absolute top-4 right-4">
+        <ModeToggle />
       </div>
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-4">
+          <div className="flex justify-center">
+            <img src="/logo-notext.png" alt="EduPlatform" className="h-16" />
+          </div>
+          <CardTitle className="text-2xl text-center">Welcome Back!</CardTitle>
+          <CardDescription className="text-center">
+            Sign in to EduPlatform
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder="Enter your email"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="Enter your password"
+              />
+            </div>
+
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? 'Signing in...' : 'Sign In'}
+            </Button>
+
+            <p className="text-center text-sm text-muted-foreground">
+              Don't have an account?{' '}
+              <Link to="/register" className="text-primary hover:underline font-medium">
+                Register here
+              </Link>
+            </p>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 };
