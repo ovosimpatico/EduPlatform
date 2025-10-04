@@ -32,3 +32,35 @@ npm run dev
 - TypeScript
 - Vite
 - SCSS
+- Nginx (for production)
+
+## Docker
+
+### Build the Docker image
+
+```bash
+docker build -t eduplatform-frontend .
+```
+
+### Run the container
+
+```bash
+docker run -p 8080:80 eduplatform-frontend
+```
+
+The frontend will be available at http://localhost:8080
+
+### Using Docker Compose
+
+From the project root:
+```bash
+docker-compose up frontend
+```
+
+## Production
+
+The production build uses Nginx to serve the static files with:
+- Gzip compression
+- Cache headers for static assets
+- SPA routing support (serves index.html for all routes)
+- Health check endpoint at `/health`
