@@ -102,12 +102,13 @@ const CourseDetail: React.FC = () => {
     );
   }
 
-  const lesson = course.lessons[currentLesson];
+  // Only access lesson when we need it (fixes out of bounds error when course is completed)
+  const lesson = course.lessons[currentLesson] || course.lessons[0];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex">
       {/* Sidebar */}
-      <div className="w-80 bg-white dark:bg-gray-900 border-r flex flex-col">
+      <div className="w-80 h-screen bg-white dark:bg-gray-900 border-r flex flex-col fixed left-0 top-0">
         <div className="p-6 border-b">
           <img src="/logo-notext.png" alt="EduPlatform" className="h-10 mb-4" />
           <h2 className="text-xl font-bold mb-2">{course.title}</h2>
@@ -128,19 +129,24 @@ const CourseDetail: React.FC = () => {
             {course.lessons.map((l: any, index: number) => (
               <button
                 key={index}
-                onClick={() => enrollment && setCurrentLesson(index)}
+                onClick={() => {
+                  if (enrollment) {
+                    setCurrentLesson(index);
+                    setShowAssessment(false); // Allow reviewing lessons after completion
+                  }
+                }}
                 disabled={!enrollment}
                 className={`w-full text-left p-3 rounded-lg border transition-colors ${
-                  currentLesson === index
+                  currentLesson === index && !showAssessment
                     ? 'bg-primary text-primary-foreground border-primary'
                     : enrollment?.progress.completedLessons.includes(index)
-                    ? 'bg-green-50 border-green-200'
+                    ? 'bg-green-50 border-green-200 dark:bg-green-900/30 dark:border-green-800'
                     : 'hover:bg-accent'
                 }`}
               >
                 <div className="flex items-start gap-2">
                   {enrollment?.progress.completedLessons.includes(index) && (
-                    <Check className="h-4 w-4 shrink-0 mt-0.5 text-green-600" />
+                    <Check className="h-4 w-4 shrink-0 mt-0.5 text-green-600 dark:text-green-400" />
                   )}
                   <span className="text-sm line-clamp-2">{l.title}</span>
                 </div>
@@ -161,7 +167,7 @@ const CourseDetail: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto ml-80">
         <div className="container mx-auto px-8 py-8 max-w-4xl">
           {!enrollment && user?.role === 'student' ? (
             <Card>
