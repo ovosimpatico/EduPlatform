@@ -1,0 +1,135 @@
+.create-course {
+  min-height: 100vh;
+  background: #f5f7fa;
+  padding: 2rem;
+}
+
+.create-course-container {
+  max-width: 900px;
+  margin: 0 auto;
+  background: white;
+  padding: 3rem;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  h1 {
+    margin: 0 0 2rem;
+    color: #333;
+  }
+
+  .form-section {
+    margin-bottom: 3rem;
+
+    h2 {
+      margin: 0 0 1.5rem;
+      color: #667eea;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 0.5rem;
+    }
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #333;
+      font-weight: 600;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-family: inherit;
+      transition: border-color 0.2s;
+
+      &:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+    }
+
+    textarea {
+      resize: vertical;
+    }
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .lesson-form,
+  .question-form {
+    background: #f5f7fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+
+    h3 {
+      margin: 0 0 1rem;
+      color: #333;
+    }
+  }
+
+  .btn-add {
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    color: #667eea;
+    border: 2px dashed #667eea;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+    width: 100%;
+
+    &:hover {
+      background: #667eea;
+      color: white;
+      border-style: solid;
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+
+    button {
+      flex: 1;
+      padding: 1rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-cancel {
+      background: #e0e0e0;
+      color: #333;
+
+      &:hover {
+        background: #d0d0d0;
+      }
+    }
+
+    .btn-submit {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      }
+    }
+  }
+}

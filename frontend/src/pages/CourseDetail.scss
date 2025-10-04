@@ -1,0 +1,226 @@
+.course-detail {
+  display: flex;
+  min-height: 100vh;
+  background: #f5f7fa;
+}
+
+.course-sidebar {
+  width: 300px;
+  background: white;
+  padding: 2rem;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+
+  h2 {
+    margin: 0 0 1rem;
+    color: #333;
+  }
+
+  .course-meta {
+    color: #666;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  .lessons-list {
+    margin: 2rem 0;
+
+    h3 {
+      margin-bottom: 1rem;
+      color: #333;
+    }
+
+    .lesson-item {
+      padding: 0.75rem;
+      margin-bottom: 0.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+      color: #666;
+
+      &:hover {
+        background: #f0f0f0;
+      }
+
+      &.active {
+        background: #667eea;
+        color: white;
+      }
+
+      &.completed {
+        color: #4caf50;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .btn-back {
+    width: 100%;
+    padding: 0.75rem;
+    background: transparent;
+    color: #667eea;
+    border: 2px solid #667eea;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+
+    &:hover {
+      background: #667eea;
+      color: white;
+    }
+  }
+}
+
+.course-main {
+  flex: 1;
+  padding: 2rem;
+}
+
+.enrollment-prompt,
+.course-overview {
+  background: white;
+  padding: 3rem;
+  border-radius: 12px;
+  text-align: center;
+  max-width: 600px;
+  margin: 2rem auto;
+
+  h2 {
+    margin-bottom: 1rem;
+    color: #333;
+  }
+
+  p {
+    color: #666;
+    margin-bottom: 2rem;
+  }
+
+  .btn-enroll {
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+}
+
+.lesson-content {
+  background: white;
+  padding: 3rem;
+  border-radius: 12px;
+  max-width: 800px;
+  margin: 0 auto;
+
+  h1 {
+    margin-bottom: 2rem;
+    color: #333;
+  }
+
+  .content {
+    line-height: 1.8;
+    color: #666;
+    margin-bottom: 2rem;
+
+    p {
+      margin-bottom: 1rem;
+    }
+  }
+
+  .btn-complete {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+}
+
+.assessment {
+  background: white;
+  padding: 3rem;
+  border-radius: 12px;
+  max-width: 800px;
+  margin: 0 auto;
+
+  h2 {
+    margin-bottom: 1rem;
+    color: #333;
+  }
+
+  .question {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+
+    h3 {
+      margin-bottom: 0.5rem;
+      color: #667eea;
+    }
+
+    p {
+      color: #333;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .options {
+      .option {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.2s;
+
+        &:hover {
+          background: #f5f7fa;
+        }
+
+        input {
+          margin-right: 0.75rem;
+        }
+      }
+    }
+  }
+
+  .btn-submit {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
