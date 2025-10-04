@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, Check, BookOpen } from 'lucide-react';
 import { ModeToggle } from '@/components/mode-toggle';
+import { LessonContent } from '@/components/lesson-content';
 
 const CourseDetail: React.FC = () => {
   const { id } = useParams();
@@ -229,10 +230,7 @@ const CourseDetail: React.FC = () => {
                 <CardTitle>{lesson.title}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div
-                  className="prose prose-slate max-w-none"
-                  dangerouslySetInnerHTML={{ __html: lesson.content }}
-                />
+                <LessonContent content={lesson.content} />
                 <Button onClick={markLessonComplete} className="w-full">
                   {currentLesson < course.lessons.length - 1
                     ? 'Mark Complete & Continue'
