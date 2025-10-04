@@ -76,7 +76,10 @@ const CreateCourse: React.FC = () => {
   return (
     <div className="create-course">
       <div className="create-course-container">
-        <h1>Create New Course</h1>
+        <div className="create-course-header">
+          <img src="/logo-notext.png" alt="EduPlatform" className="create-logo" />
+          <h1>Create New Course</h1>
+        </div>
 
         <form onSubmit={handleSubmit}>
           <div className="form-section">

@@ -1,6 +1,21 @@
-# EduPlatform - Interactive Educational Platform
+<p align="center">
+  <img src="frontend/public/logo-notext.png" alt="EduPlatform logo" width="200"
+  style = "border-radius: 10%;"/>
+</p>
 
-An interactive educational platform with diagnostic assessments and course management for students, teachers, and administrators.
+<h1 align="center">EduPlatform</h1>
+
+<p align="center">
+  <strong>Interactive educational platform with diagnostic assessments and personalized learning paths</strong>
+</p>
+
+<!-- summary -->
+<p align="center">
+  <a href="#tech-stack">Tech Stack</a> •
+  <a href="#getting-started-development">Getting Started</a> •
+  <a href="#docker-support-production">Docker</a> •
+  <a href="#license">License</a>
+</p>
 
 ## Tech Stack
 

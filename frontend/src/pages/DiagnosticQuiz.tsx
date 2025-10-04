@@ -47,6 +47,7 @@ const DiagnosticQuiz: React.FC = () => {
     return (
       <div className="quiz-container">
         <div className="quiz-card">
+          <img src="/logo-notext.png" alt="EduPlatform" className="quiz-logo" />
           <h1>Diagnostic Quiz Not Available</h1>
           <p>Please contact an administrator to set up the diagnostic quiz.</p>
           <button onClick={() => navigate('/dashboard')} className="btn-primary">
@@ -61,6 +62,7 @@ const DiagnosticQuiz: React.FC = () => {
     return (
       <div className="quiz-container">
         <div className="quiz-card result-card">
+          <img src="/logo-notext.png" alt="EduPlatform" className="quiz-logo" />
           <h1>Your Level: {result.level}</h1>
           <p className="result-message">
             Based on your performance, we recommend starting with {result.level} level courses.
@@ -92,6 +94,7 @@ const DiagnosticQuiz: React.FC = () => {
   return (
     <div className="quiz-container">
       <div className="quiz-card">
+        <img src="/logo-notext.png" alt="EduPlatform" className="quiz-logo" />
         <h1>Diagnostic Quiz - English</h1>
         <p className="quiz-description">
           This quiz will help determine your current level and recommend appropriate courses.

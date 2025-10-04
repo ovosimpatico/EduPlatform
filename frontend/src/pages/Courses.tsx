@@ -47,7 +47,10 @@ const Courses: React.FC = () => {
   return (
     <div className="courses-page">
       <div className="courses-header">
-        <h1>Browse Courses</h1>
+        <div className="header-brand">
+          <img src="/logo-notext.png" alt="EduPlatform" className="header-logo" />
+          <h1>Browse Courses</h1>
+        </div>
         <button onClick={() => navigate('/dashboard')} className="btn-back">
           ← Back to Dashboard
         </button>

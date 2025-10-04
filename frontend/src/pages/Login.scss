@@ -15,6 +15,13 @@
   width: 100%;
   max-width: 450px;
 
+  .logo {
+    display: block;
+    width: 200px;
+    max-width: 80%;
+    margin: 0 auto 2rem;
+  }
+
   h1 {
     margin: 0 0 0.5rem;
     font-size: 2rem;

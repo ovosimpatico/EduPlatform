@@ -29,7 +29,8 @@ const Login: React.FC = () => {
   return (
     <div className="login-container">
       <div className="login-card">
-        <h1>Welcome to EduPlatform</h1>
+        <img src="/logo-text.png" alt="EduPlatform" className="logo" />
+        <h1>Welcome Back!</h1>
         <p className="subtitle">Sign in to continue your learning journey</p>
 
         <form onSubmit={handleSubmit} className="login-form">

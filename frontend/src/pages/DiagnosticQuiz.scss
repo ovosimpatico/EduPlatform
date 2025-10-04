@@ -17,6 +17,13 @@
   max-height: 90vh;
   overflow-y: auto;
 
+  .quiz-logo {
+    display: block;
+    height: 80px;
+    width: auto;
+    margin: 0 auto 2rem;
+  }
+
   h1 {
     margin: 0 0 1rem;
     color: #333;

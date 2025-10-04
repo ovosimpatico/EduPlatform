@@ -44,7 +44,10 @@ const Dashboard: React.FC = () => {
   return (
     <div className="dashboard">
       <nav className="dashboard-nav">
-        <h2>EduPlatform</h2>
+        <div className="nav-brand">
+          <img src="/logo-notext.png" alt="EduPlatform" className="nav-logo" />
+          <h2>EduPlatform</h2>
+        </div>
         <div className="nav-links">
           <button onClick={() => navigate('/courses')}>Browse Courses</button>
           {user?.role === 'student' && !user?.level && (

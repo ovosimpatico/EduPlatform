@@ -12,6 +12,25 @@
   border-radius: 16px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
+  .create-course-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 2px solid #f0f0f0;
+
+    .create-logo {
+      height: 60px;
+      width: auto;
+    }
+
+    h1 {
+      margin: 0;
+      color: #333;
+    }
+  }
+
   h1 {
     margin: 0 0 2rem;
     color: #333;

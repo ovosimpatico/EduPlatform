@@ -31,6 +31,7 @@ const Register: React.FC = () => {
   return (
     <div className="login-container">
       <div className="login-card">
+        <img src="/logo-text.png" alt="EduPlatform" className="logo" />
         <h1>Join EduPlatform</h1>
         <p className="subtitle">Create an account to start learning</p>
 

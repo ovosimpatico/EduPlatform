@@ -91,6 +91,9 @@ const CourseDetail: React.FC = () => {
   return (
     <div className="course-detail">
       <div className="course-sidebar">
+        <div className="sidebar-header">
+          <img src="/logo-notext.png" alt="EduPlatform" className="sidebar-logo" />
+        </div>
         <h2>{course.title}</h2>
         <p className="course-meta">Level: {course.level}</p>
         <p className="course-meta">Category: {course.category}</p>
