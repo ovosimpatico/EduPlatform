@@ -1,5 +1,6 @@
 import { Router, Response } from 'express';
 import DiagnosticQuiz from '../models/DiagnosticQuiz';
+import DiagnosticResult from '../models/DiagnosticResult';
 import User from '../models/User';
 import { authenticate, authorize, AuthRequest } from '../middleware/auth';
 
@@ -101,6 +102,22 @@ router.post('/quiz/:id/submit', authenticate, async (req: AuthRequest, res: Resp
     } else if (overallPercentage >= quiz.levelThresholds.beginner) {
       level = 'beginner';
     }
+
+    // Save diagnostic result
+    const diagnosticResult = new DiagnosticResult({
+      student: req.user?._id,
+      quiz: quiz._id,
+      answers,
+      scores: {
+        beginner: { correct: scores.beginner.correct, total: scores.beginner.total },
+        intermediate: { correct: scores.intermediate.correct, total: scores.intermediate.total },
+        advanced: { correct: scores.advanced.correct, total: scores.advanced.total },
+      },
+      overallPercentage,
+      determinedLevel: level,
+    });
+
+    await diagnosticResult.save();
 
     // Update user level
     await User.findByIdAndUpdate(req.user?._id, { level });
@@ -204,8 +221,62 @@ router.delete('/:id', authenticate, authorize('teacher'), async (req: AuthReques
       return;
     }
 
+    // Delete all results associated with this quiz
+    await DiagnosticResult.deleteMany({ quiz: req.params.id });
+
     await quiz.deleteOne();
     res.json({ message: 'Quiz deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
+  }
+});
+
+// Get quiz details with correct answers (teachers only)
+router.get('/quiz/:id/full', authenticate, authorize('teacher'), async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const quiz = await DiagnosticQuiz.findById(req.params.id)
+      .populate('teacher', 'name');
+
+    if (!quiz) {
+      res.status(404).json({ message: 'Diagnostic quiz not found' });
+      return;
+    }
+
+    // Only the quiz teacher or admin can view full quiz with answers
+    if (quiz.teacher._id.toString() !== req.user?._id?.toString() && req.user?.role !== 'admin') {
+      res.status(403).json({ message: 'Access denied' });
+      return;
+    }
+
+    res.json(quiz);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
+  }
+});
+
+// Get results for a specific diagnostic quiz (teachers only)
+router.get('/quiz/:id/results', authenticate, authorize('teacher'), async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    // Check if quiz exists and user is the teacher
+    const quiz = await DiagnosticQuiz.findById(id);
+    if (!quiz) {
+      res.status(404).json({ message: 'Diagnostic quiz not found' });
+      return;
+    }
+
+    // Only the quiz teacher or admin can view results
+    if (quiz.teacher.toString() !== req.user?._id?.toString() && req.user?.role !== 'admin') {
+      res.status(403).json({ message: 'Access denied' });
+      return;
+    }
+
+    const results = await DiagnosticResult.find({ quiz: id })
+      .populate('student', 'name email')
+      .sort({ completedAt: -1 });
+
+    res.json(results);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error });
   }

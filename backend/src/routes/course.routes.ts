@@ -1,5 +1,7 @@
 import { Router, Response } from 'express';
 import Course from '../models/Course';
+import Enrollment from '../models/Enrollment';
+import Badge from '../models/Badge';
 import { authenticate, authorize, AuthRequest } from '../middleware/auth';
 
 const router = Router();
@@ -106,7 +108,15 @@ router.delete('/:id', authenticate, authorize('teacher', 'admin'), async (req: A
       return;
     }
 
+    // Delete all enrollments associated with this course
+    await Enrollment.deleteMany({ course: req.params.id });
+
+    // Delete all badges associated with this course
+    await Badge.deleteMany({ course: req.params.id });
+
+    // Delete the course
     await Course.findByIdAndDelete(req.params.id);
+
     res.json({ message: 'Course deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error });

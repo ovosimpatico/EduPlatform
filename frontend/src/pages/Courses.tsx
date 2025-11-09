@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, BookOpen, User } from 'lucide-react';
+import { ArrowLeft, BookOpen, Trash2, Settings, User } from 'lucide-react';
 import { ModeToggle } from '@/components/mode-toggle';
+import { UserMenu } from '@/components/user-menu';
 import { EmptyState } from '@/components/empty-state';
 import { PiBookOpen } from 'react-icons/pi';
 
@@ -47,6 +48,20 @@ const Courses: React.FC = () => {
     }
   };
 
+  const handleDeleteCourse = async (courseId: string, courseTitle: string) => {
+    if (!window.confirm(`Are you sure you want to delete "${courseTitle}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      await api.delete(`/courses/${courseId}`);
+      alert('Course deleted successfully!');
+      loadCourses(); // Reload the courses list
+    } catch (error: any) {
+      alert(error.response?.data?.message || 'Failed to delete course');
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -66,11 +81,12 @@ const Courses: React.FC = () => {
               <h1 className="text-2xl font-bold">Browse Courses</h1>
             </div>
             <div className="flex items-center gap-2">
-              <ModeToggle />
-              <Button variant="outline" onClick={() => navigate('/dashboard')}>
+              <Button variant="ghost" onClick={() => navigate('/dashboard')}>
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Dashboard
+                Dashboard
               </Button>
+              <ModeToggle />
+              <UserMenu />
             </div>
           </div>
         </div>
@@ -158,6 +174,26 @@ const Courses: React.FC = () => {
                     >
                       Enroll Now
                     </Button>
+                  )}
+                  {user?.role === 'teacher' && course.teacher._id === user.id && (
+                    <>
+                      <Button
+                        variant="default"
+                        size="icon"
+                        onClick={() => navigate(`/course-management/${course._id}`)}
+                        title="Gerenciar alunos"
+                      >
+                        <Settings className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        onClick={() => handleDeleteCourse(course._id, course.title)}
+                        title="Delete course"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </>
                   )}
                 </CardFooter>
               </Card>

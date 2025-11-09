@@ -48,6 +48,37 @@ router.get('/my-courses', authenticate, async (req: AuthRequest, res: Response):
     const enrollments = await Enrollment.find({ student: req.user?._id })
       .populate('course');
 
+    // Filter out enrollments where course has been deleted
+    const validEnrollments = enrollments.filter(e => e.course !== null);
+
+    res.json(validEnrollments);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
+  }
+});
+
+// Get enrollments for a specific course (teachers only)
+router.get('/course/:courseId', authenticate, async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { courseId } = req.params;
+
+    // Check if course exists and user is the teacher
+    const course = await Course.findById(courseId);
+    if (!course) {
+      res.status(404).json({ message: 'Course not found' });
+      return;
+    }
+
+    // Only the course teacher or admin can view enrollments
+    if (course.teacher.toString() !== req.user?._id?.toString() && req.user?.role !== 'admin') {
+      res.status(403).json({ message: 'Access denied' });
+      return;
+    }
+
+    const enrollments = await Enrollment.find({ course: courseId })
+      .populate('student', 'name email')
+      .sort({ enrolledAt: -1 });
+
     res.json(enrollments);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error });
@@ -136,6 +167,7 @@ router.post('/:id/assessment', authenticate, async (req: AuthRequest, res: Respo
 
     const score = (correctAnswers / questions.length) * 100;
     enrollment.finalAssessmentScore = score;
+    enrollment.finalAssessmentAnswers = answers;
 
     // Check if passed
     if (score >= course.finalAssessment.passingScore) {

@@ -7,42 +7,70 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
-import { BookOpen, Trophy, GraduationCap, Plus, LogOut } from 'lucide-react';
+import { BookOpen, Trophy, GraduationCap, Plus, Trash2, Eye, Settings } from 'lucide-react';
 import { ModeToggle } from '@/components/mode-toggle';
+import { UserMenu } from '@/components/user-menu';
 import { EmptyState } from '@/components/empty-state';
 import { PiBookOpenText, PiTrophy } from 'react-icons/pi';
 
 const Dashboard: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [enrollments, setEnrollments] = useState<any[]>([]);
   const [badges, setBadges] = useState<any[]>([]);
+  const [teacherCourses, setTeacherCourses] = useState<any[]>([]);
+  const [teacherQuizzes, setTeacherQuizzes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        if (user?.role === 'student') {
-          const [enrollmentsRes, badgesRes] = await Promise.all([
-            api.get('/enrollments/my-courses'),
-            api.get('/badges/my-badges'),
-          ]);
-          setEnrollments(enrollmentsRes.data);
-          setBadges(badgesRes.data);
-        }
-      } catch (error) {
-        console.error('Failed to load data', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadData();
   }, [user]);
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
+  const loadData = async () => {
+    try {
+      if (user?.role === 'student') {
+        const [enrollmentsRes, badgesRes] = await Promise.all([
+          api.get('/enrollments/my-courses'),
+          api.get('/badges/my-badges'),
+        ]);
+        // Filter out enrollments with null courses (deleted courses)
+        const validEnrollments = enrollmentsRes.data.filter((e: any) => e.course !== null);
+        setEnrollments(validEnrollments);
+        setBadges(badgesRes.data);
+      } else if (user?.role === 'teacher') {
+        const [coursesRes, quizzesRes] = await Promise.all([
+          api.get('/courses'),
+          api.get('/diagnostic/my-quizzes'),
+        ]);
+        // Filter courses created by the current teacher
+        // Use toString() for safe comparison between ObjectId and string
+        const myCourses = coursesRes.data.filter((course: any) => {
+          if (!course.teacher) return false;
+          const teacherId = typeof course.teacher === 'object' ? course.teacher._id : course.teacher;
+          return teacherId?.toString() === user.id?.toString();
+        });
+        setTeacherCourses(myCourses);
+        setTeacherQuizzes(quizzesRes.data);
+      }
+    } catch (error) {
+      console.error('Failed to load data', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteCourse = async (courseId: string, courseTitle: string) => {
+    if (!window.confirm(`Are you sure you want to delete "${courseTitle}"? This action cannot be undone and will affect all enrolled students.`)) {
+      return;
+    }
+
+    try {
+      await api.delete(`/courses/${courseId}`);
+      alert('Course deleted successfully!');
+      loadData(); // Reload the data
+    } catch (error: any) {
+      alert(error.response?.data?.message || 'Failed to delete course');
+    }
   };
 
   if (loading) {
@@ -87,10 +115,7 @@ const Dashboard: React.FC = () => {
                 </>
               )}
               <ModeToggle />
-              <Button variant="outline" onClick={handleLogout}>
-                <LogOut className="mr-2 h-4 w-4" />
-                Logout
-              </Button>
+              <UserMenu />
             </div>
           </div>
         </div>
@@ -212,18 +237,125 @@ const Dashboard: React.FC = () => {
         )}
 
         {user?.role === 'teacher' && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Course Management</CardTitle>
-              <CardDescription>Create and manage your courses from here.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button onClick={() => navigate('/create-course')}>
-                <Plus className="mr-2 h-4 w-4" />
-                Create New Course
-              </Button>
-            </CardContent>
-          </Card>
+          <>
+            <div>
+              <h3 className="text-2xl font-bold mb-4 flex items-center gap-2">
+                <BookOpen className="h-6 w-6" />
+                Meus Cursos
+              </h3>
+            {teacherCourses.length === 0 ? (
+              <EmptyState
+                icon={<PiBookOpenText />}
+                title="No courses created yet"
+                description="Start sharing your knowledge by creating your first course."
+                action={{
+                  label: 'Create Course',
+                  onClick: () => navigate('/create-course'),
+                }}
+              />
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {teacherCourses.map((course) => (
+                  <Card key={course._id} className="hover:shadow-lg transition-shadow">
+                    <CardHeader>
+                      <CardTitle className="line-clamp-1">{course.title}</CardTitle>
+                      <CardDescription className="line-clamp-2">
+                        {course.description}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="secondary" className="capitalize">
+                          {course.level}
+                        </Badge>
+                        <Badge variant="outline">{course.category}</Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {course.lessons.length} lessons
+                      </p>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          onClick={() => navigate(`/course/${course._id}`)}
+                          className="flex-1"
+                        >
+                          <Eye className="mr-2 h-4 w-4" />
+                          View
+                        </Button>
+                        <Button
+                          variant="default"
+                          onClick={() => navigate(`/course-management/${course._id}`)}
+                          title="Gerenciar alunos"
+                        >
+                          <Settings className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          onClick={() => handleDeleteCourse(course._id, course.title)}
+                          title="Delete course"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+            </div>
+
+            <Separator className="my-8" />
+
+            <div>
+              <h3 className="text-2xl font-bold mb-4 flex items-center gap-2">
+                <GraduationCap className="h-6 w-6" />
+                Minhas Provas Diagnósticas
+              </h3>
+              {teacherQuizzes.length === 0 ? (
+                <EmptyState
+                  icon={<PiBookOpenText />}
+                  title="Nenhuma prova criada ainda"
+                  description="Crie provas diagnósticas para avaliar o nível dos seus alunos."
+                  action={{
+                    label: 'Criar Prova',
+                    onClick: () => navigate('/create-diagnostic-quiz'),
+                  }}
+                />
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {teacherQuizzes.map((quiz) => (
+                    <Card key={quiz._id} className="hover:shadow-lg transition-shadow">
+                      <CardHeader>
+                        <CardTitle className="line-clamp-1">{quiz.title}</CardTitle>
+                        <CardDescription className="line-clamp-2">
+                          {quiz.description || quiz.category}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline">{quiz.category}</Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          {quiz.questions?.length || 0} questões
+                        </p>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="default"
+                            onClick={() => navigate(`/diagnostic-management/${quiz._id}`)}
+                            className="flex-1"
+                          >
+                            <Settings className="mr-2 h-4 w-4" />
+                            Gerenciar
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
         )}
       </div>
     </div>

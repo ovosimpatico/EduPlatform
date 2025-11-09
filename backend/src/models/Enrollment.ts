@@ -8,6 +8,7 @@ export interface IEnrollment extends Document {
     currentLesson: number;
   };
   finalAssessmentScore?: number;
+  finalAssessmentAnswers?: number[];
   completed: boolean;
   enrolledAt: Date;
   completedAt?: Date;
@@ -36,6 +37,9 @@ const enrollmentSchema = new Schema<IEnrollment>({
   finalAssessmentScore: {
     type: Number,
   },
+  finalAssessmentAnswers: [{
+    type: Number,
+  }],
   completed: {
     type: Boolean,
     default: false,

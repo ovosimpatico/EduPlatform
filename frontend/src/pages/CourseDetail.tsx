@@ -8,8 +8,9 @@ import { Badge } from '@/components/ui/badge';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, Check, BookOpen } from 'lucide-react';
+import { ArrowLeft, Check, BookOpen, Trash2 } from 'lucide-react';
 import { ModeToggle } from '@/components/mode-toggle';
+import { UserMenu } from '@/components/user-menu';
 import { LessonContent } from '@/components/lesson-content';
 
 const CourseDetail: React.FC = () => {
@@ -86,6 +87,20 @@ const CourseDetail: React.FC = () => {
     }
   };
 
+  const handleDeleteCourse = async () => {
+    if (!window.confirm(`Are you sure you want to delete "${course?.title}"? This action cannot be undone and will affect all enrolled students.`)) {
+      return;
+    }
+
+    try {
+      await api.delete(`/courses/${id}`);
+      alert('Course deleted successfully!');
+      navigate('/courses');
+    } catch (error: any) {
+      alert(error.response?.data?.message || 'Failed to delete course');
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -156,13 +171,28 @@ const CourseDetail: React.FC = () => {
         </div>
 
         <div className="p-6 border-t space-y-2">
-          <div className="w-full flex justify-center">
-            <ModeToggle />
-          </div>
+          {user?.role === 'teacher' && course?.teacher?._id === user.id && (
+            <>
+              <Button
+                variant="destructive"
+                onClick={handleDeleteCourse}
+                className="w-full"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete Course
+              </Button>
+              <Separator />
+            </>
+          )}
           <Button variant="outline" onClick={() => navigate('/dashboard')} className="w-full">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Dashboard
           </Button>
+          <Separator />
+          <div className="flex items-center justify-center gap-2">
+            <ModeToggle />
+            <UserMenu />
+          </div>
         </div>
       </div>
 
